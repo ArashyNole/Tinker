@@ -12,5 +12,17 @@
     <string name="date_of_birth">Date of Birth</string>
     <string name="relationship">Relationship</string>
     <string name="logo">logodesc</string>
+    <string name="about_me">About Me</string>
+    <string name="interests">Interests</string>
+    <string name="books">Books</string>
+    <string name="music">Music</string>
+    <string name="movies">Movies</string>
+    <string name="television">Television</string>
+    <string name="abouthint">Tell us about yourself.</string>
+    <string name="readhint">What do you read?</string>
+    <string name="listenhint">What do you listen to?</string>
+    <string name="watchhint">What do you watch?</string>
+    <string name="hodorhint">Hodor?</string>
+    <string name="save">Save</string>
     
 </resources>

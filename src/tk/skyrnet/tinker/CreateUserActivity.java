@@ -7,8 +7,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,55 +21,53 @@ import com.facebook.widget.ProfilePictureView;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
-public class UserDetailsActivity extends Activity {
+public class CreateUserActivity extends Activity {
 
-	private static final int PROFILE_EDIT = 0;
-	
 	private ProfilePictureView userProfilePictureView;
 	private TextView userNameView;
-	private TextView userLocationView;
-	private TextView userGenderView;
-	private TextView userDateOfBirthView;
-	private TextView userRelationshipView;
-	private TextView userDescription;
-	private TextView userMusic;
-	private TextView userMovies;
-	private TextView userBooks;
-	private TextView userTelevision;
+	private EditText userLocationView;
+	private EditText userGenderView;
+	private EditText userDateOfBirthView;
+	private EditText userRelationshipView;
+	private EditText userDescription;
+	private EditText userMusic;
+	private EditText userMovies;
+	private EditText userBooks;
+	private EditText userTelevision;
+	private Button saveButton;
+    private String facebookId;
+    private String userName;
 	
-	private Button logoutButton;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.userdetails);
+		setContentView(R.layout.useredit);
 
 		userProfilePictureView = (ProfilePictureView) findViewById(R.id.userProfilePicture);
 		userNameView = (TextView) findViewById(R.id.userName);
-		userLocationView = (TextView) findViewById(R.id.userLocation);
-		userGenderView = (TextView) findViewById(R.id.userGender);
-		userDateOfBirthView = (TextView) findViewById(R.id.userDateOfBirth);
-		userRelationshipView = (TextView) findViewById(R.id.userRelationship);
-		userDescription = (TextView) findViewById(R.id.userDescription);
-		userMusic = (TextView) findViewById(R.id.userMusic);
-		userMovies = (TextView) findViewById(R.id.userMovies);
-		userBooks = (TextView) findViewById(R.id.userBooks);
-		userTelevision = (TextView) findViewById(R.id.userTelevision);
+		userLocationView = (EditText) findViewById(R.id.userLocation);
+		userGenderView = (EditText) findViewById(R.id.userGender);
+		userDateOfBirthView = (EditText) findViewById(R.id.userDateOfBirth);
+		userRelationshipView = (EditText) findViewById(R.id.userRelationship);
+		userDescription = (EditText) findViewById(R.id.userDescription);
+		userMusic = (EditText) findViewById(R.id.userMusic);
+		userMovies = (EditText) findViewById(R.id.userMovies);
+		userBooks = (EditText) findViewById(R.id.userBooks);
+		userTelevision = (EditText) findViewById(R.id.userTelevision);
 
-		logoutButton = (Button) findViewById(R.id.logoutButton);
-		logoutButton.setOnClickListener(new View.OnClickListener() {
+		saveButton = (Button) findViewById(R.id.saveButton);
+		saveButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onLogoutButtonClicked();
+				onSaveButtonClicked();
 			}
 		});
 
 		// Fetch Facebook user info if the session is active
 		Session session = ParseFacebookUtils.getSession();
 		if (session != null && session.isOpened()) {
-			//makeMeRequest();
-			updateViewsWithProfileInfo();
+			makeMeRequest();
 		}
 	}
 
@@ -83,7 +79,7 @@ public class UserDetailsActivity extends Activity {
 		if (currentUser != null) {
 			// Check if the user is currently logged
 			// and show any cached content
-			updateViewsWithProfileInfo();
+		//	updateViewsWithProfileInfo();
 		} else {
 			// If the user is not logged in, go to the
 			// activity showing the login view.
@@ -99,8 +95,11 @@ public class UserDetailsActivity extends Activity {
 						if (user != null) {
 							// Create a JSON object to hold the profile info
 							JSONObject userProfile = new JSONObject();
+							
 							try {
 								// Populate the JSON object
+								facebookId = user.getId();
+								userName = user.getName();
 								userProfile.put("facebookId", user.getId());
 								userProfile.put("name", user.getName());
 								if (user.getLocation().getProperty("name") != null) {
@@ -121,7 +120,6 @@ public class UserDetailsActivity extends Activity {
 													(String) user
 															.getProperty("relationship_status"));
 								}
-								
 								
 
 								// Save the user profile info in a user property
@@ -196,33 +194,6 @@ public class UserDetailsActivity extends Activity {
 				} else {
 					userRelationshipView.setText("");
 				}
-				if (userProfile.getString("description") != null) {
-					userDescription.setText(userProfile.getString("description"));
-				} else {
-					userDescription.setText("");
-				}
-				if (userProfile.getString("music") != null) {
-					userMusic.setText(userProfile.getString("music"));
-				} else {
-					userMusic.setText("");
-				}
-				if (userProfile.getString("movies") != null) {
-					userMovies.setText(userProfile.getString("movies"));
-				} else {
-					userMovies.setText("");
-				}
-				if (userProfile.getString("books") != null) {
-					userBooks.setText(userProfile
-							.getString("books"));
-				} else {
-					userBooks.setText("");
-				}
-				if (userProfile.getString("television") != null) {
-					userTelevision.setText(userProfile
-							.getString("television"));
-				} else {
-					userTelevision.setText("");
-				}
 			} catch (JSONException e) {
 				Log.d(IntegratingFacebookTutorialApplication.TAG,
 						"Error parsing saved user data.");
@@ -230,25 +201,38 @@ public class UserDetailsActivity extends Activity {
 
 		}
 	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		menu.add(0, PROFILE_EDIT, 0, "Edit Profile");
-		//getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+
+	private void onSaveButtonClicked() {
+		JSONObject userProfile = new JSONObject();
+		
+		try {
+			userProfile.put("facebookId", facebookId);
+			userProfile.put("name", userName);
+			userProfile.put("location", userLocationView.getText().toString());
+			userProfile.put("gender", userGenderView.getText().toString());
+			userProfile.put("birthday", userDateOfBirthView.getText().toString());
+			userProfile.put("relationship_status", userRelationshipView.getText().toString());
+			userProfile.put("description", userDescription.getText().toString());
+			userProfile.put("music", userMusic.getText().toString());
+			userProfile.put("movies", userMovies.getText().toString());
+			userProfile.put("books", userBooks.getText().toString());
+			userProfile.put("television", userTelevision.getText().toString());
+		}
+		catch (JSONException e) {
+			Log.d(IntegratingFacebookTutorialApplication.TAG,
+					"Error parsing saved user data.");
+		}
+		
+		// Save the user
+		ParseUser currentUser = ParseUser
+				.getCurrentUser();
+		currentUser.put("profile", userProfile);
+		currentUser.saveInBackground();
+
+		// Go to the login view
+		startDetailsActivity();
 	}
 	
-    /* Handles item selections */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-    	case PROFILE_EDIT:
-    		startEditActivity();
-            return true;
-        }
-        return false;
-    }
-
 	private void onLogoutButtonClicked() {
 		// Log the user out
 		ParseUser.logOut();
@@ -264,11 +248,10 @@ public class UserDetailsActivity extends Activity {
 		startActivity(intent);
 	}
 	
-	private void startEditActivity() {
-		Intent intent = new Intent(this, UserEditActivity.class);
+	private void startDetailsActivity() {
+		Intent intent = new Intent(this, UserDetailsActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
 	}
-	
 }

@@ -74,7 +74,7 @@ public class LoginActivity extends Activity {
 				} else if (user.isNew()) {
 					Log.d(IntegratingFacebookTutorialApplication.TAG,
 							"User signed up and logged in through Facebook!");
-					showUserDetailsActivity();
+					showUserCreateActivity();
 				} else {
 					Log.d(IntegratingFacebookTutorialApplication.TAG,
 							"User logged in through Facebook!");
@@ -86,6 +86,11 @@ public class LoginActivity extends Activity {
 
 	private void showUserDetailsActivity() {
 		Intent intent = new Intent(this, UserDetailsActivity.class);
+		startActivity(intent);
+	}
+	
+	private void showUserCreateActivity() {
+		Intent intent = new Intent(this, CreateUserActivity.class);
 		startActivity(intent);
 	}
 }

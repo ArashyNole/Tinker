@@ -17,6 +17,7 @@
             android:layout_marginTop="20dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal" >
+
             <com.facebook.widget.ProfilePictureView
                 android:id="@+id/userProfilePicture"
                 android:layout_height="wrap_content"
@@ -43,21 +44,23 @@
             android:shrinkColumns="1"
             android:gravity="center_horizontal"
             android:background="@drawable/table_round_shape">
-        <TableRow>
+        <TableRow android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/location" />
-            <TextView
+            <EditText
                 android:id="@+id/userLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
+                android:inputType="text"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -71,21 +74,23 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow>
+        <TableRow android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/gender" />
-            <TextView
+            <EditText
                 android:id="@+id/userGender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
+                android:inputType="text"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -99,21 +104,23 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow>
+        <TableRow android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/date_of_birth" />
-            <TextView
+            <EditText
                 android:id="@+id/userDateOfBirth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
+                android:inputType="date"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -127,21 +134,23 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow>
+        <TableRow android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/relationship" />
-            <TextView
+            <EditText
                 android:id="@+id/userRelationship"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
+                android:inputType="text"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -155,22 +164,25 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp">
+        <TableRow android:minHeight="70dp"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/about_me" />
-            <TextView
+            <EditText
                 android:id="@+id/userDescription"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
-                android:singleLine="false"
+                android:inputType="textMultiLine"
+                android:hint="@string/abouthint"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -184,24 +196,25 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp">
+        <TableRow android:minHeight="70dp"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/books" />
-            <TextView
+            <EditText
                 android:id="@+id/userBooks"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
-                android:singleLine="false"
-                android:maxLines="100"
-                android:lines="100"
+                android:inputType="textMultiLine"
+                android:hint="@string/readhint"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -215,24 +228,26 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp">
+        <TableRow android:minHeight="70dp"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/music" />
-            <TextView
+            <EditText
                 android:id="@+id/userMusic"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:textColor="#333"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
-                android:singleLine="false"
-                android:maxLines="100"
-                android:textColor="#333"
+                android:inputType="textMultiLine"
+                android:hint="@string/listenhint"
                 android:textSize="16sp" />
         </TableRow>
         <TableRow>
@@ -245,23 +260,25 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp">
+        <TableRow android:minHeight="70dp"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/movies" />
-            <TextView
+            <EditText
                 android:id="@+id/userMovies"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
-                android:singleLine="false"
-                android:maxLines="100"
+                android:inputType="textMultiLine"
+                android:hint="@string/watchhint"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -275,38 +292,41 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp">
+        <TableRow android:minHeight="70dp"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:gravity="center_vertical"
                 android:text="@string/television" />
-            <TextView
+            <EditText
                 android:id="@+id/userTelevision"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
-                android:singleLine="false"
-				android:maxLines="100"
+                android:inputType="textMultiLine"
+                android:hint="@string/hodorhint"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
      </TableLayout>
     
     <Button
-        android:id="@+id/logoutButton"
+        android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:layout_marginTop="50dp"
-        android:text="@string/logout"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
+        android:text="@string/save"
         android:textColor="#fff"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/button_login"
+        android:background="@drawable/scorp_button"
         />
     </LinearLayout>
 </ScrollView>
