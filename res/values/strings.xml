@@ -24,5 +24,9 @@
     <string name="watchhint">What do you watch?</string>
     <string name="hodorhint">Hodor?</string>
     <string name="save">Save</string>
+    <string name="when_are_you_">Where are you?</string>
+    <string name="male_or_female_">Male or female?</string>
+    <string name="when_were_you_born_">When were you born?</string>
+    <string name="seeing_anyone_">Seeing anyone?</string>
     
 </resources>

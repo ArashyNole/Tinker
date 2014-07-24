@@ -1,5 +1,7 @@
 package tk.skyrnet.tinker;
 
+import java.util.HashMap;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.facebook.FacebookRequestError;
@@ -20,12 +21,16 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 public class UserDetailsActivity extends Activity {
 
 	private static final int PROFILE_EDIT = 0;
+	private static final int FIND_USER = 1;
 	
 	private ProfilePictureView userProfilePictureView;
 	private TextView userNameView;
@@ -155,79 +160,83 @@ public class UserDetailsActivity extends Activity {
 		request.executeAsync();
 
 	}
+	
+	private void buildProfile(JSONObject userProfile)
+	{
+		try {
+			if (userProfile.getString("facebookId") != null) {
+				String facebookId = userProfile.get("facebookId")
+						.toString();
+				userProfilePictureView.setProfileId(facebookId);
+			} else {
+				// Show the default, blank user profile picture
+				userProfilePictureView.setProfileId(null);
+			}
+			if (userProfile.getString("name") != null) {
+				userNameView.setText(userProfile.getString("name"));
+			} else {
+				userNameView.setText("");
+			}
+			if (userProfile.getString("location") != null) {
+				userLocationView.setText(userProfile.getString("location"));
+			} else {
+				userLocationView.setText("");
+			}
+			if (userProfile.getString("gender") != null) {
+				userGenderView.setText(userProfile.getString("gender"));
+			} else {
+				userGenderView.setText("");
+			}
+			if (userProfile.getString("birthday") != null) {
+				userDateOfBirthView.setText(userProfile
+						.getString("birthday"));
+			} else {
+				userDateOfBirthView.setText("");
+			}
+			if (userProfile.getString("relationship_status") != null) {
+				userRelationshipView.setText(userProfile
+						.getString("relationship_status"));
+			} else {
+				userRelationshipView.setText("");
+			}
+			if (userProfile.getString("description") != null) {
+				userDescription.setText(userProfile.getString("description"));
+			} else {
+				userDescription.setText("");
+			}
+			if (userProfile.getString("music") != null) {
+				userMusic.setText(userProfile.getString("music"));
+			} else {
+				userMusic.setText("");
+			}
+			if (userProfile.getString("movies") != null) {
+				userMovies.setText(userProfile.getString("movies"));
+			} else {
+				userMovies.setText("");
+			}
+			if (userProfile.getString("books") != null) {
+				userBooks.setText(userProfile
+						.getString("books"));
+			} else {
+				userBooks.setText("");
+			}
+			if (userProfile.getString("television") != null) {
+				userTelevision.setText(userProfile
+						.getString("television"));
+			} else {
+				userTelevision.setText("");
+			}
+		} catch (JSONException e) {
+			Log.d(IntegratingFacebookTutorialApplication.TAG,
+					"Error parsing saved user data.");
+		}
+	}
 
 	private void updateViewsWithProfileInfo() {
 		ParseUser currentUser = ParseUser.getCurrentUser();
 		if (currentUser.get("profile") != null) {
 			JSONObject userProfile = currentUser.getJSONObject("profile");
-			try {
-				if (userProfile.getString("facebookId") != null) {
-					String facebookId = userProfile.get("facebookId")
-							.toString();
-					userProfilePictureView.setProfileId(facebookId);
-				} else {
-					// Show the default, blank user profile picture
-					userProfilePictureView.setProfileId(null);
-				}
-				if (userProfile.getString("name") != null) {
-					userNameView.setText(userProfile.getString("name"));
-				} else {
-					userNameView.setText("");
-				}
-				if (userProfile.getString("location") != null) {
-					userLocationView.setText(userProfile.getString("location"));
-				} else {
-					userLocationView.setText("");
-				}
-				if (userProfile.getString("gender") != null) {
-					userGenderView.setText(userProfile.getString("gender"));
-				} else {
-					userGenderView.setText("");
-				}
-				if (userProfile.getString("birthday") != null) {
-					userDateOfBirthView.setText(userProfile
-							.getString("birthday"));
-				} else {
-					userDateOfBirthView.setText("");
-				}
-				if (userProfile.getString("relationship_status") != null) {
-					userRelationshipView.setText(userProfile
-							.getString("relationship_status"));
-				} else {
-					userRelationshipView.setText("");
-				}
-				if (userProfile.getString("description") != null) {
-					userDescription.setText(userProfile.getString("description"));
-				} else {
-					userDescription.setText("");
-				}
-				if (userProfile.getString("music") != null) {
-					userMusic.setText(userProfile.getString("music"));
-				} else {
-					userMusic.setText("");
-				}
-				if (userProfile.getString("movies") != null) {
-					userMovies.setText(userProfile.getString("movies"));
-				} else {
-					userMovies.setText("");
-				}
-				if (userProfile.getString("books") != null) {
-					userBooks.setText(userProfile
-							.getString("books"));
-				} else {
-					userBooks.setText("");
-				}
-				if (userProfile.getString("television") != null) {
-					userTelevision.setText(userProfile
-							.getString("television"));
-				} else {
-					userTelevision.setText("");
-				}
-			} catch (JSONException e) {
-				Log.d(IntegratingFacebookTutorialApplication.TAG,
-						"Error parsing saved user data.");
-			}
-
+			buildProfile(userProfile);
 		}
 	}
 	
@@ -235,6 +244,7 @@ public class UserDetailsActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		menu.add(0, PROFILE_EDIT, 0, "Edit Profile");
+		menu.add(0, FIND_USER, 1, "Find User");
 		//getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
@@ -245,9 +255,28 @@ public class UserDetailsActivity extends Activity {
     	case PROFILE_EDIT:
     		startEditActivity();
             return true;
-        }
+		case FIND_USER:
+			findUser();
+			return true;
+    	}
         return false;
     }
+
+	private void findUser() {
+		ParseUser currentUser = ParseUser.getCurrentUser();
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("username", currentUser.getUsername());
+		ParseCloud.callFunctionInBackground("getProfile", params, new FunctionCallback<HashMap<String, String>>() {
+		   public void done(HashMap<String, String> hm, ParseException e) {
+		       if (e == null) {
+		    	  Log.d("UserDetailsActivity", hm.values().toString());
+		    	  JSONObject profile = new JSONObject(hm);
+		          buildProfile(profile);
+		       }
+		   }
+		});
+		
+	}
 
 	private void onLogoutButtonClicked() {
 		// Log the user out

@@ -61,6 +61,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
                 android:inputType="text"
+                android:hint="@string/when_are_you_"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -91,6 +92,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
                 android:inputType="text"
+                android:hint="@string/male_or_female_"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -121,6 +123,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
                 android:inputType="date"
+                android:hint="@string/when_were_you_born_"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -151,6 +154,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="left"
                 android:inputType="text"
+                android:hint="@string/seeing_anyone_"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>

@@ -1,10 +1,21 @@
 package tk.skyrnet.tinker;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -98,22 +109,28 @@ public class CreateUserActivity extends Activity {
 							
 							try {
 								// Populate the JSON object
+								Log.d("CreateUserActivity", "FBid");
 								facebookId = user.getId();
+								Log.d("CreateUserActivity", "uname");
 								userName = user.getName();
 								userProfile.put("facebookId", user.getId());
 								userProfile.put("name", user.getName());
-								if (user.getLocation().getProperty("name") != null) {
+								Log.d("CreateUserActivity", "location");
+								if (user.getLocation() != null && user.getLocation().getProperty("name") != null) {
 									userProfile.put("location", (String) user
 											.getLocation().getProperty("name"));
 								}
+								Log.d("CreateUserActivity", "gender");
 								if (user.getProperty("gender") != null) {
 									userProfile.put("gender",
 											(String) user.getProperty("gender"));
 								}
+								Log.d("CreateUserActivity", "birthday");
 								if (user.getBirthday() != null) {
 									userProfile.put("birthday",
 											user.getBirthday());
 								}
+								Log.d("CreateUserActivity", "relstat");
 								if (user.getProperty("relationship_status") != null) {
 									userProfile
 											.put("relationship_status",
@@ -121,7 +138,7 @@ public class CreateUserActivity extends Activity {
 															.getProperty("relationship_status"));
 								}
 								
-
+								Log.d("CreateUserActivity", "save");
 								// Save the user profile info in a user property
 								ParseUser currentUser = ParseUser
 										.getCurrentUser();
@@ -203,34 +220,7 @@ public class CreateUserActivity extends Activity {
 	}
 
 	private void onSaveButtonClicked() {
-		JSONObject userProfile = new JSONObject();
-		
-		try {
-			userProfile.put("facebookId", facebookId);
-			userProfile.put("name", userName);
-			userProfile.put("location", userLocationView.getText().toString());
-			userProfile.put("gender", userGenderView.getText().toString());
-			userProfile.put("birthday", userDateOfBirthView.getText().toString());
-			userProfile.put("relationship_status", userRelationshipView.getText().toString());
-			userProfile.put("description", userDescription.getText().toString());
-			userProfile.put("music", userMusic.getText().toString());
-			userProfile.put("movies", userMovies.getText().toString());
-			userProfile.put("books", userBooks.getText().toString());
-			userProfile.put("television", userTelevision.getText().toString());
-		}
-		catch (JSONException e) {
-			Log.d(IntegratingFacebookTutorialApplication.TAG,
-					"Error parsing saved user data.");
-		}
-		
-		// Save the user
-		ParseUser currentUser = ParseUser
-				.getCurrentUser();
-		currentUser.put("profile", userProfile);
-		currentUser.saveInBackground();
-
-		// Go to the login view
-		startDetailsActivity();
+		new MyTask().execute(userLocationView.getText().toString());
 	}
 	
 	private void onLogoutButtonClicked() {
@@ -253,5 +243,89 @@ public class CreateUserActivity extends Activity {
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
+		finish();
 	}
+	
+	// Found at this address:
+	// https://stackoverflow.com/questions/5205650/geocoder-getfromlocation-throws-ioexception-on-android-emulator
+	public static JSONObject getLocationInfo(String address) {
+	    StringBuilder stringBuilder = new StringBuilder();
+	    try {
+
+	    address = address.replaceAll(" ","%20");    
+
+	    HttpPost httppost = new HttpPost("http://maps.google.com/maps/api/geocode/json?address=" + address + "&sensor=false");
+	    HttpClient client = new DefaultHttpClient();
+	    HttpResponse response;
+	    stringBuilder = new StringBuilder();
+
+
+	        response = client.execute(httppost);
+	        HttpEntity entity = response.getEntity();
+	        InputStream stream = entity.getContent();
+	        int b;
+	        while ((b = stream.read()) != -1) {
+	            stringBuilder.append((char) b);
+	        }
+	    } catch (ClientProtocolException e) {
+	    } catch (IOException e) {
+	    }
+
+	    JSONObject jsonObject = new JSONObject();
+	    try {
+	        jsonObject = new JSONObject(stringBuilder.toString());
+	    } catch (JSONException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+	    }
+
+	    return jsonObject;
+	}
+	
+	private class MyTask extends AsyncTask<String, Void, JSONObject> {
+
+	   @Override
+	   protected JSONObject doInBackground(String... urls) {
+		   return getLocationInfo(urls[0]);
+	   }
+
+	   @Override
+	   protected void onPostExecute(JSONObject jsonObject) {
+			JSONObject userProfile = new JSONObject();
+				
+			try {		
+				userProfile.put("facebookId", facebookId);
+				userProfile.put("name", userName);
+				userProfile.put("location", userLocationView.getText().toString());
+				userProfile.put("lat", ((JSONArray)jsonObject.get("results")).getJSONObject(0)
+	                .getJSONObject("geometry").getJSONObject("location")
+	                .getDouble("lat"));
+				userProfile.put("lng", ((JSONArray)jsonObject.get("results")).getJSONObject(0)
+		            .getJSONObject("geometry").getJSONObject("location")
+		            .getDouble("lng"));	
+				userProfile.put("gender", userGenderView.getText().toString());
+				userProfile.put("relationship_status", userRelationshipView.getText().toString());
+				userProfile.put("birthday", userDateOfBirthView.getText().toString());
+				userProfile.put("description", userDescription.getText().toString());
+				userProfile.put("music", userMusic.getText().toString());
+				userProfile.put("movies", userMovies.getText().toString());
+				userProfile.put("books", userBooks.getText().toString());
+				userProfile.put("television", userTelevision.getText().toString());
+			}
+			catch (JSONException e) {
+				Log.d(IntegratingFacebookTutorialApplication.TAG,
+						"Error parsing saved user data.");
+			}
+				
+			// Save the user
+			ParseUser currentUser = ParseUser
+					.getCurrentUser();
+			currentUser.put("profile", userProfile);
+			currentUser.saveInBackground();
+
+			// Go to the login view
+			startDetailsActivity();
+			   
+		   }
+		}
 }
