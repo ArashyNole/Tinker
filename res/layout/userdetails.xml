@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:background="#FFFFFF"
     android:layout_height="match_parent"
+    android:id="@+id/scroll"
     android:orientation="vertical">
 
     <LinearLayout

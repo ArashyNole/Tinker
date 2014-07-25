@@ -9,17 +9,19 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.facebook.FacebookRequestError;
-import com.facebook.Request;
-import com.facebook.Response;
 import com.facebook.Session;
-import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
@@ -27,11 +29,16 @@ import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
-public class UserDetailsActivity extends Activity {
+public class UserDetailsActivity extends Activity implements OnClickListener {
 
 	private static final int PROFILE_EDIT = 0;
 	private static final int FIND_USER = 1;
-	
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    
+    private GestureDetector gestureDetector;
+    View.OnTouchListener gestureListener;
 	private ProfilePictureView userProfilePictureView;
 	private TextView userNameView;
 	private TextView userLocationView;
@@ -43,8 +50,9 @@ public class UserDetailsActivity extends Activity {
 	private TextView userMovies;
 	private TextView userBooks;
 	private TextView userTelevision;
-	
+	private ScrollView userScroll;
 	private Button logoutButton;
+	private String viewingFacebookId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +71,7 @@ public class UserDetailsActivity extends Activity {
 		userMovies = (TextView) findViewById(R.id.userMovies);
 		userBooks = (TextView) findViewById(R.id.userBooks);
 		userTelevision = (TextView) findViewById(R.id.userTelevision);
+		userScroll = (ScrollView) findViewById(R.id.scroll);
 
 		logoutButton = (Button) findViewById(R.id.logoutButton);
 		logoutButton.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +80,18 @@ public class UserDetailsActivity extends Activity {
 				onLogoutButtonClicked();
 			}
 		});
+		
+        // Gesture detection
+        gestureDetector = new GestureDetector(this, new MyGestureDetector());
+        gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        };
+        
+        userScroll.setOnClickListener(UserDetailsActivity.this); 
+        userScroll.setOnTouchListener(gestureListener);
+        
 
 		// Fetch Facebook user info if the session is active
 		Session session = ParseFacebookUtils.getSession();
@@ -88,77 +109,12 @@ public class UserDetailsActivity extends Activity {
 		if (currentUser != null) {
 			// Check if the user is currently logged
 			// and show any cached content
-			updateViewsWithProfileInfo();
+			buildProfile(currentUser.getJSONObject("profile"));
 		} else {
 			// If the user is not logged in, go to the
 			// activity showing the login view.
 			startLoginActivity();
 		}
-	}
-
-	private void makeMeRequest() {
-		Request request = Request.newMeRequest(ParseFacebookUtils.getSession(),
-				new Request.GraphUserCallback() {
-					@Override
-					public void onCompleted(GraphUser user, Response response) {
-						if (user != null) {
-							// Create a JSON object to hold the profile info
-							JSONObject userProfile = new JSONObject();
-							try {
-								// Populate the JSON object
-								userProfile.put("facebookId", user.getId());
-								userProfile.put("name", user.getName());
-								if (user.getLocation().getProperty("name") != null) {
-									userProfile.put("location", (String) user
-											.getLocation().getProperty("name"));
-								}
-								if (user.getProperty("gender") != null) {
-									userProfile.put("gender",
-											(String) user.getProperty("gender"));
-								}
-								if (user.getBirthday() != null) {
-									userProfile.put("birthday",
-											user.getBirthday());
-								}
-								if (user.getProperty("relationship_status") != null) {
-									userProfile
-											.put("relationship_status",
-													(String) user
-															.getProperty("relationship_status"));
-								}
-								
-								
-
-								// Save the user profile info in a user property
-								ParseUser currentUser = ParseUser
-										.getCurrentUser();
-								currentUser.put("profile", userProfile);
-								currentUser.saveInBackground();
-
-								// Show the user info
-								updateViewsWithProfileInfo();
-							} catch (JSONException e) {
-								Log.d(IntegratingFacebookTutorialApplication.TAG,
-										"Error parsing returned user data.");
-							}
-
-						} else if (response.getError() != null) {
-							if ((response.getError().getCategory() == FacebookRequestError.Category.AUTHENTICATION_RETRY)
-									|| (response.getError().getCategory() == FacebookRequestError.Category.AUTHENTICATION_REOPEN_SESSION)) {
-								Log.d(IntegratingFacebookTutorialApplication.TAG,
-										"The facebook session was invalidated.");
-								onLogoutButtonClicked();
-							} else {
-								Log.d(IntegratingFacebookTutorialApplication.TAG,
-										"Some other error: "
-												+ response.getError()
-														.getErrorMessage());
-							}
-						}
-					}
-				});
-		request.executeAsync();
-
 	}
 	
 	private void buildProfile(JSONObject userProfile)
@@ -167,10 +123,12 @@ public class UserDetailsActivity extends Activity {
 			if (userProfile.getString("facebookId") != null) {
 				String facebookId = userProfile.get("facebookId")
 						.toString();
+				viewingFacebookId = facebookId;
 				userProfilePictureView.setProfileId(facebookId);
 			} else {
 				// Show the default, blank user profile picture
 				userProfilePictureView.setProfileId(null);
+				viewingFacebookId = "0";
 			}
 			if (userProfile.getString("name") != null) {
 				userNameView.setText(userProfile.getString("name"));
@@ -266,12 +224,17 @@ public class UserDetailsActivity extends Activity {
 		ParseUser currentUser = ParseUser.getCurrentUser();
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("username", currentUser.getUsername());
-		ParseCloud.callFunctionInBackground("getProfile", params, new FunctionCallback<HashMap<String, String>>() {
+		params.put("viewingFacebookId", viewingFacebookId);
+		ParseCloud.callFunctionInBackground("getNewProfile", params, new FunctionCallback<HashMap<String, String>>() {
 		   public void done(HashMap<String, String> hm, ParseException e) {
 		       if (e == null) {
 		    	  Log.d("UserDetailsActivity", hm.values().toString());
 		    	  JSONObject profile = new JSONObject(hm);
 		          buildProfile(profile);
+		       }
+		       else
+		       {
+		    	   Log.d("UserDetailsActivity", "Something went wrong!");
 		       }
 		   }
 		});
@@ -300,4 +263,35 @@ public class UserDetailsActivity extends Activity {
 		startActivity(intent);
 	}
 	
+
+    class MyGestureDetector extends SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            try {
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                    return false;
+                // right to left swipe
+                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                	findUser();
+                	Toast.makeText(UserDetailsActivity.this, "Loading User", Toast.LENGTH_SHORT).show();
+
+                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                	findUser();
+                    Toast.makeText(UserDetailsActivity.this, "User Saved", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                // nothing
+            }
+            return false;
+        }
+
+            @Override
+        public boolean onDown(MotionEvent e) {
+              return true;
+        }
+    }
+    
+    public void onClick(View v) {
+        Toast.makeText(UserDetailsActivity.this, "onClick", Toast.LENGTH_SHORT).show();
+    }
 }
