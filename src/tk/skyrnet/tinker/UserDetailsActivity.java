@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -201,22 +202,32 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		menu.add(0, PROFILE_EDIT, 0, "Edit Profile");
-		menu.add(0, FIND_USER, 1, "Find User");
-		//getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		//menu.add(0, PROFILE_EDIT, 0, "Edit Profile");
+		//menu.add(0, FIND_USER, 1, "Find User");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options, menu);
+        return super.onCreateOptionsMenu(menu);
 	}
 	
     /* Handles item selections */
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-    	case PROFILE_EDIT:
+    	case R.id.profile:
+    		Toast.makeText(UserDetailsActivity.this, "My Profile", Toast.LENGTH_SHORT).show();
+    		updateViewsWithProfileInfo();
+            return true;
+    	case R.id.edit:
+    		Toast.makeText(UserDetailsActivity.this, "Edit Profile", Toast.LENGTH_SHORT).show();
     		startEditActivity();
             return true;
-		case FIND_USER:
+		case R.id.find:
+			Toast.makeText(UserDetailsActivity.this, "Loading User", Toast.LENGTH_SHORT).show();
 			findUser();
 			return true;
-    	}
+		case R.id.chat:
+			Toast.makeText(UserDetailsActivity.this, "Chat", Toast.LENGTH_SHORT).show();
+			return true;
+		}
         return false;
     }
 

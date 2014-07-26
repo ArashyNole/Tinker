@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/profile"
+        android:title="My Profile"
+        android:icon="@drawable/ic_action_person"
+        android:showAsAction="ifRoom"
+    />
+    <item
+        android:id="@+id/edit"
+        android:title="Edit Profile"
+        android:icon="@drawable/ic_action_edit"
+        android:showAsAction="ifRoom"
+    />
+    <item
+        android:id="@+id/chat"
+        android:title="Chat"
+        android:icon="@drawable/ic_action_chat"
+        android:showAsAction="ifRoom"
+    />
+    
+    <item
+        android:id="@+id/find"
+        android:title="Find User"
+        android:icon="@drawable/ic_action_search"
+        android:showAsAction="ifRoom"
+    />
+</menu>
