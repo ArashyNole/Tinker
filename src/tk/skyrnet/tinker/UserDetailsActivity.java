@@ -1,6 +1,8 @@
 package tk.skyrnet.tinker;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,16 +26,17 @@ import android.widget.Toast;
 
 import com.facebook.Session;
 import com.facebook.widget.ProfilePictureView;
+import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 public class UserDetailsActivity extends Activity implements OnClickListener {
 
-	private static final int PROFILE_EDIT = 0;
-	private static final int FIND_USER = 1;
     private static final int SWIPE_MIN_DISTANCE = 120;
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
@@ -53,7 +56,8 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 	private TextView userTelevision;
 	private ScrollView userScroll;
 	private Button logoutButton;
-	private String viewingFacebookId;
+	public static ParseUser viewingUser;
+	public static ArrayList<ParseUser> userList = new ArrayList<ParseUser>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +102,16 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 		Session session = ParseFacebookUtils.getSession();
 		if (session != null && session.isOpened()) {
 			//makeMeRequest();
-			updateViewsWithProfileInfo();
+			if (viewingUser == null)
+			{
+				viewingUser = ParseUser.getCurrentUser();
+				updateViewsWithProfileInfo();
+			}
+			
+			else
+			{
+				buildProfile(viewingUser.getJSONObject("profile"));
+			}
 		}
 	}
 
@@ -108,12 +121,8 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 
 		ParseUser currentUser = ParseUser.getCurrentUser();
 		if (currentUser != null) {
-			// Check if the user is currently logged
-			// and show any cached content
-			buildProfile(currentUser.getJSONObject("profile"));
+			buildProfile(viewingUser.getJSONObject("profile"));
 		} else {
-			// If the user is not logged in, go to the
-			// activity showing the login view.
 			startLoginActivity();
 		}
 	}
@@ -124,12 +133,10 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 			if (userProfile.getString("facebookId") != null) {
 				String facebookId = userProfile.get("facebookId")
 						.toString();
-				viewingFacebookId = facebookId;
 				userProfilePictureView.setProfileId(facebookId);
 			} else {
 				// Show the default, blank user profile picture
 				userProfilePictureView.setProfileId(null);
-				viewingFacebookId = "0";
 			}
 			if (userProfile.getString("name") != null) {
 				userNameView.setText(userProfile.getString("name"));
@@ -193,6 +200,8 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 
 	private void updateViewsWithProfileInfo() {
 		ParseUser currentUser = ParseUser.getCurrentUser();
+		viewingUser = currentUser;
+		
 		if (currentUser.get("profile") != null) {
 			JSONObject userProfile = currentUser.getJSONObject("profile");
 			buildProfile(userProfile);
@@ -216,6 +225,27 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
     		Toast.makeText(UserDetailsActivity.this, "My Profile", Toast.LENGTH_SHORT).show();
     		updateViewsWithProfileInfo();
             return true;
+    	case R.id.userlist:
+			Toast.makeText(UserDetailsActivity.this, "Saved User List", Toast.LENGTH_SHORT).show();
+			ParseRelation<ParseObject> relation = ParseUser.getCurrentUser().getRelation("saved");
+			userList.clear();
+			
+			relation.getQuery().findInBackground(new FindCallback<ParseObject>() {
+			    public void done(List<ParseObject> results, ParseException e) {
+			      if (e != null) {
+			        // There was an error
+			      } else {
+			    	  for (int i = 0; i < results.size(); ++i)
+			    	  {
+			    		Log.d("UserDetailsActivity", results.get(i).getJSONObject("profile").toString());
+						userList.add((ParseUser) results.get(i));
+			    	  }
+			    	  
+			    	  startSavedListActivity();
+			      }
+			    }
+			});
+			return true;
     	case R.id.edit:
     		Toast.makeText(UserDetailsActivity.this, "Edit Profile", Toast.LENGTH_SHORT).show();
     		startEditActivity();
@@ -235,12 +265,13 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 		ParseUser currentUser = ParseUser.getCurrentUser();
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("username", currentUser.getUsername());
-		params.put("viewingFacebookId", viewingFacebookId);
-		ParseCloud.callFunctionInBackground("getNewProfile", params, new FunctionCallback<HashMap<String, String>>() {
-		   public void done(HashMap<String, String> hm, ParseException e) {
+		params.put("viewingObjectId", viewingUser.getObjectId());
+		ParseCloud.callFunctionInBackground("getNearbyProfile", params, new FunctionCallback<ParseUser>() {
+		   public void done(ParseUser parseUser, ParseException e) {
 		       if (e == null) {
-		    	  Log.d("UserDetailsActivity", hm.values().toString());
-		    	  JSONObject profile = new JSONObject(hm);
+		    	  viewingUser = parseUser;
+		    	  Log.d("UserDetailsActivity", parseUser.getJSONObject("profile").toString());
+		    	  JSONObject profile = parseUser.getJSONObject("profile");
 		          buildProfile(profile);
 		       }
 		       else
@@ -267,6 +298,13 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 		startActivity(intent);
 	}
 	
+	private void startSavedListActivity() {
+		Intent intent = new Intent(this, SavedListActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+	
 	private void startEditActivity() {
 		Intent intent = new Intent(this, UserEditActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -282,13 +320,28 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
                 if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
                     return false;
                 // right to left swipe
-                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)
+                {
                 	findUser();
                 	Toast.makeText(UserDetailsActivity.this, "Loading User", Toast.LENGTH_SHORT).show();
-
-                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                	findUser();
-                    Toast.makeText(UserDetailsActivity.this, "User Saved", Toast.LENGTH_SHORT).show();
+                }
+                
+                else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)
+                {
+                	ParseUser user = ParseUser.getCurrentUser();
+                	if (user.getObjectId() != viewingUser.getObjectId())
+                	{
+                		ParseRelation<ParseObject> relation = user.getRelation("saved");
+                		relation.add(viewingUser);
+                		user.saveInBackground();
+                		findUser();
+                		Toast.makeText(UserDetailsActivity.this, "User Saved", Toast.LENGTH_SHORT).show();
+                	}
+                	else
+                	{
+                		findUser();
+                    	Toast.makeText(UserDetailsActivity.this, "Loading User", Toast.LENGTH_SHORT).show();
+                	}
                 }
             } catch (Exception e) {
                 // nothing

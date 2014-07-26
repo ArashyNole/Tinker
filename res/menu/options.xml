@@ -3,9 +3,17 @@
     <item
         android:id="@+id/profile"
         android:title="My Profile"
-        android:icon="@drawable/ic_action_person"
+        android:icon="@drawable/ic_action_home"
         android:showAsAction="ifRoom"
     />
+    
+    <item
+        android:id="@+id/userlist"
+        android:title="Saved User List"
+        android:icon="@drawable/ic_action_group"
+        android:showAsAction="ifRoom"
+    />
+    
     <item
         android:id="@+id/edit"
         android:title="Edit Profile"
