@@ -11,7 +11,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -34,8 +37,15 @@ import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.sinch.android.rtc.PushPair;
+import com.sinch.android.rtc.messaging.Message;
+import com.sinch.android.rtc.messaging.MessageClient;
+import com.sinch.android.rtc.messaging.MessageClientListener;
+import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
+import com.sinch.android.rtc.messaging.MessageFailureInfo;
 
 public class UserDetailsActivity extends Activity implements OnClickListener {
 
@@ -102,7 +112,7 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 		Intent serviceIntent = new Intent(getApplicationContext(),
                 MessageService.class);
 		startService(serviceIntent);
-        
+
         if (!ParseUser.getCurrentUser().getBoolean("viewedTut")) {
         	  AlertDialog.Builder builder = new AlertDialog.Builder(this);
               builder.setTitle(R.string.tutorial_title);
@@ -120,6 +130,28 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 		
 		if (session != null && session.isOpened()) {
 			//makeMeRequest();
+			String data = getIntent().getDataString();
+			
+			if (data != null)
+			{
+				String objId = data.substring(40);
+				
+				ParseQuery<ParseUser> query = ParseUser.getQuery();
+				query.whereEqualTo("objectId", objId);
+				query.findInBackground(new FindCallback<ParseUser>() {
+				    public void done(List<ParseUser> users, ParseException e) {
+				        if (e == null) {
+				        	viewingUser = (ParseUser) users.get(0);
+				            buildProfile(users.get(0).getJSONObject("profile"));
+				        } else {
+				            findUser();
+				        }
+				    }
+				});
+				
+				Log.d("UserDetailsActivity", objId);
+			}
+			
 			if (viewingUser == null)
 			{
 				viewingUser = ParseUser.getCurrentUser();

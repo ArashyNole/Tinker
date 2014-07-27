@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.json.JSONException;
+
 import tk.skyrnet.tinker.MessageService.MessageServiceInterface;
 import android.app.Activity;
 import android.content.ComponentName;
@@ -11,6 +13,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -79,7 +83,16 @@ ServiceConnection, MessageClientListener {
             Toast.makeText(this, "Please enter a message", Toast.LENGTH_LONG).show();
             return;
         }
-
+        
+        try {
+			messageBody = "<a href='tk.skyrnet.tinker://UserDetailsActivity/"
+						+ ParseUser.getCurrentUser().getObjectId() + "'>"
+                        + ParseUser.getCurrentUser().getJSONObject("profile").get("name")
+                        + "</a> " + messageBody;
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         messageService.sendMessage(recipientId, messageBody);
     }
     
@@ -162,7 +175,7 @@ ServiceConnection, MessageClientListener {
     	//Gets called every time you update the view with an
     	//incoming or outgoing message
     	public void addMessage(Message message, int direction) {
-    	    messages.add(new Pair(message, direction));
+    	    messages.add(new Pair<Message, Integer>(message, direction));
     	    notifyDataSetChanged();
     	}
 
@@ -185,8 +198,9 @@ ServiceConnection, MessageClientListener {
     	@Override
     	public View getView(int i, View convertView, ViewGroup viewGroup) {
     		int direction = messages.get(i).second;
+    		//Log.d("n", Integer.toString(messages.get(i).second));
 
-    		if (convertView == null) {
+    		//if (convertView == null) {
     		    int res = 0;
     		    if (direction == DIRECTION_INCOMING) {
     		        res = R.layout.message_left;
@@ -194,12 +208,13 @@ ServiceConnection, MessageClientListener {
     		        res = R.layout.message_right;
     		    }
     		    convertView = layoutInflater.inflate(res, viewGroup, false);
-    		}
+    		//}
     		
     		Message message = messages.get(i).first;
 
     		TextView txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
-    		txtMessage.setText(message.getTextBody());
+    		txtMessage.setMovementMethod(LinkMovementMethod.getInstance());
+    		txtMessage.setText(Html.fromHtml(message.getTextBody()));
 
     		return convertView;
     	}
