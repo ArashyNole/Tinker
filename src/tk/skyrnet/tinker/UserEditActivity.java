@@ -74,7 +74,7 @@ public class UserEditActivity extends Activity {
 				onSaveButtonClicked();
 			}
 		});
-
+		
 		// Fetch Facebook user info if the session is active
 		Session session = ParseFacebookUtils.getSession();
 		if (session != null && session.isOpened()) {

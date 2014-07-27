@@ -19,5 +19,4 @@ public class IntegratingFacebookTutorialApplication extends Application {
 		ParseFacebookUtils.initialize(getString(R.string.app_id));
 
 	}
-
 }
