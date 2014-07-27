@@ -2,6 +2,20 @@
 
 Tinker is a social networking application that allows people to find other people in their local area with similar interests. It is similar to Tinder, but oriented toward making friends instead of finding dates.
 
+=== Features ===
+
+* Sign in using Facebook, information is pulled from Facebook profile to Tinker profile.
+* User's can modify Tinker profile at anytime.
+* User's can broswe through local Tinker users.
+* User's may display interest in another user by swiping right on their profile. Swiping left signifies no interest in the user.
+* If two user's swipe right for one another, they recieve a notification. They can then begin messaging one another.
+* Matched user's can be unmatched if one user removes them from their list.
+
+=== Todos ===
+- [ ] Add private messaging
+- [ ] Edit layout of profiles
+- [ ] Notify users of a match
+
 === SETUP ===
 
 Clone the repository into your android workspace with the command "git clone https://github.com/ArashyNole/Tinker.git"
@@ -15,3 +29,4 @@ Click General → Existing Projects into Workspace
 Make sure the "Select root directory" radio button is selected, and browse to your workspace directory.
 
 In the Projects box, check the box next to Tinker and click Finish
+
