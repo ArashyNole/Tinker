@@ -97,6 +97,10 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
         userScroll.setOnClickListener(UserDetailsActivity.this); 
         userScroll.setOnTouchListener(gestureListener);
         
+		Intent serviceIntent = new Intent(getApplicationContext(),
+                MessageService.class);
+		startService(serviceIntent);
+        
 
 		// Fetch Facebook user info if the session is active
 		Session session = ParseFacebookUtils.getSession();
@@ -220,6 +224,8 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 	
     /* Handles item selections */
     public boolean onOptionsItemSelected(MenuItem item) {
+    	ParseRelation<ParseObject> relation;
+    	
         switch (item.getItemId()) {
     	case R.id.profile:
     		Toast.makeText(UserDetailsActivity.this, "My Profile", Toast.LENGTH_SHORT).show();
@@ -227,7 +233,7 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
             return true;
     	case R.id.userlist:
 			Toast.makeText(UserDetailsActivity.this, "Saved User List", Toast.LENGTH_SHORT).show();
-			ParseRelation<ParseObject> relation = ParseUser.getCurrentUser().getRelation("saved");
+			relation = ParseUser.getCurrentUser().getRelation("saved");
 			userList.clear();
 			
 			relation.getQuery().findInBackground(new FindCallback<ParseObject>() {
@@ -256,6 +262,24 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 			return true;
 		case R.id.chat:
 			Toast.makeText(UserDetailsActivity.this, "Chat", Toast.LENGTH_SHORT).show();
+			relation = ParseUser.getCurrentUser().getRelation("saved");
+			userList.clear();
+			
+			relation.getQuery().findInBackground(new FindCallback<ParseObject>() {
+			    public void done(List<ParseObject> results, ParseException e) {
+			      if (e != null) {
+			        // There was an error
+			      } else {
+			    	  for (int i = 0; i < results.size(); ++i)
+			    	  {
+			    		Log.d("UserDetailsActivity", results.get(i).getJSONObject("profile").toString());
+						userList.add((ParseUser) results.get(i));
+			    	  }
+			    	  
+			    	  startChatActivity();
+			      }
+			    }
+			});;
 			return true;
 		}
         return false;
@@ -312,6 +336,14 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 		startActivity(intent);
 	}
 	
+	private void startChatActivity()
+	{
+		Intent serviceIntent = new Intent(getApplicationContext(),
+                MessageService.class);
+		startService(serviceIntent);
+		Intent intent = new Intent(getApplicationContext(), ListUsersActivity.class);
+		startActivity(intent);
+	}
 
     class MyGestureDetector extends SimpleOnGestureListener {
         @Override

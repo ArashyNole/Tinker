@@ -28,5 +28,6 @@
     <string name="male_or_female_">Male or female?</string>
     <string name="when_were_you_born_">When were you born?</string>
     <string name="seeing_anyone_">Seeing anyone?</string>
+    <string name="message_elipses">Message...</string>
     
 </resources>
