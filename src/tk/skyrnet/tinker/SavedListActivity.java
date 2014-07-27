@@ -1,7 +1,7 @@
 package tk.skyrnet.tinker;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import org.json.JSONException;
 
@@ -20,7 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
@@ -98,6 +99,7 @@ public class SavedListActivity extends ListActivity {
         switch (item.getItemId()) {
     	case R.id.profile:
     		Toast.makeText(SavedListActivity.this, "My Profile", Toast.LENGTH_SHORT).show();
+    		UserDetailsActivity.viewingUser = ParseUser.getCurrentUser();
     		startDetailsActivity();
             return true;
     	case R.id.userlist:
@@ -109,15 +111,40 @@ public class SavedListActivity extends ListActivity {
             return true;
 		case R.id.find:
 			Toast.makeText(SavedListActivity.this, "Loading User", Toast.LENGTH_SHORT).show();
-    		startDetailsActivity();
-			// findUser();
+			findUser();
 			return true;
 		case R.id.chat:
 			Toast.makeText(SavedListActivity.this, "Chat", Toast.LENGTH_SHORT).show();
+			Intent serviceIntent = new Intent(getApplicationContext(),
+	                MessageService.class);
+			startService(serviceIntent);
+			Intent intent = new Intent(getApplicationContext(), ListUsersActivity.class);
+			startActivity(intent);
 			return true;
 		}
         return false;
     }
+    
+	private void findUser() {
+		ParseUser currentUser = ParseUser.getCurrentUser();
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("username", currentUser.getUsername());
+		params.put("viewingObjectId", UserDetailsActivity.viewingUser.getObjectId());
+		ParseCloud.callFunctionInBackground("getNearbyProfile", params, new FunctionCallback<ParseUser>() {
+		   public void done(ParseUser parseUser, ParseException e) {
+		       if (e == null) {
+		    	  UserDetailsActivity.viewingUser = parseUser;
+		    	  Log.d("UserDetailsActivity", parseUser.getJSONObject("profile").toString());
+		    	  startDetailsActivity();
+		       }
+		       else
+		       {
+		    	   Log.d("UserDetailsActivity", "Something went wrong!");
+		       }
+		   }
+		});
+		
+	}
     
     private void startDetailsActivity() {
 		Intent intent = new Intent(this, UserDetailsActivity.class);

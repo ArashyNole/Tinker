@@ -3,6 +3,7 @@ package tk.skyrnet.tinker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -36,6 +37,8 @@ import com.facebook.Session;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
@@ -121,17 +124,42 @@ public class UserEditActivity extends Activity {
         return super.onCreateOptionsMenu(menu);
 	}
 	
+	private void findUser() {
+		ParseUser currentUser = ParseUser.getCurrentUser();
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("username", currentUser.getUsername());
+		params.put("viewingObjectId", UserDetailsActivity.viewingUser.getObjectId());
+		ParseCloud.callFunctionInBackground("getNearbyProfile", params, new FunctionCallback<ParseUser>() {
+		   public void done(ParseUser parseUser, ParseException e) {
+		       if (e == null) {
+		    	  UserDetailsActivity.viewingUser = parseUser;
+		    	  Log.d("UserDetailsActivity", parseUser.getJSONObject("profile").toString());
+		    	  startDetailsActivity();
+		       }
+		       else
+		       {
+		    	   Log.d("UserDetailsActivity", "Something went wrong!");
+		       }
+		   }
+		});
+		
+	}
+	
     /* Handles item selections */
     public boolean onOptionsItemSelected(MenuItem item) {
+    	
+    	ParseRelation<ParseObject> relation;
+    	
         switch (item.getItemId()) {
     	case R.id.profile:
     		Toast.makeText(UserEditActivity.this, "My Profile", Toast.LENGTH_SHORT).show();
-    		updateViewsWithProfileInfo();
+    		UserDetailsActivity.viewingUser = ParseUser.getCurrentUser();
+    		startDetailsActivity();
             return true;
     	case R.id.userlist:
 			Toast.makeText(UserEditActivity.this, "Saved User List", Toast.LENGTH_SHORT).show();
-			ParseRelation<ParseObject> relation = ParseUser.getCurrentUser().getRelation("saved");
-			userList.clear();
+			relation = ParseUser.getCurrentUser().getRelation("saved");
+			UserDetailsActivity.userList.clear();
 			
 			relation.getQuery().findInBackground(new FindCallback<ParseObject>() {
 			    public void done(List<ParseObject> results, ParseException e) {
@@ -141,7 +169,7 @@ public class UserEditActivity extends Activity {
 			    	  for (int i = 0; i < results.size(); ++i)
 			    	  {
 			    		Log.d("UserDetailsActivity", results.get(i).getJSONObject("profile").toString());
-						userList.add((ParseUser) results.get(i));
+						UserDetailsActivity.userList.add((ParseUser) results.get(i));
 			    	  }
 			    	  
 			    	  startSavedListActivity();
@@ -151,14 +179,35 @@ public class UserEditActivity extends Activity {
 			return true;
     	case R.id.edit:
     		Toast.makeText(UserEditActivity.this, "Edit Profile", Toast.LENGTH_SHORT).show();
-    		startEditActivity();
             return true;
 		case R.id.find:
 			Toast.makeText(UserEditActivity.this, "Loading User", Toast.LENGTH_SHORT).show();
-			startDetailsActivity();
+			findUser();
 			return true;
 		case R.id.chat:
 			Toast.makeText(UserEditActivity.this, "Chat", Toast.LENGTH_SHORT).show();
+			relation = ParseUser.getCurrentUser().getRelation("saved");
+			UserDetailsActivity.userList.clear();
+			
+			relation.getQuery().findInBackground(new FindCallback<ParseObject>() {
+			    public void done(List<ParseObject> results, ParseException e) {
+			      if (e != null) {
+			        // There was an error
+			      } else {
+			    	  for (int i = 0; i < results.size(); ++i)
+			    	  {
+			    		Log.d("UserDetailsActivity", results.get(i).getJSONObject("profile").toString());
+						UserDetailsActivity.userList.add((ParseUser) results.get(i));
+			    	  }
+			    	  
+			    		Intent serviceIntent = new Intent(getApplicationContext(),
+			    	            MessageService.class);
+			    		startService(serviceIntent);
+			    		Intent intent = new Intent(getApplicationContext(), ListUsersActivity.class);
+			    		startActivity(intent);
+			      }
+			    }
+			});
 			return true;
 		}
         return false;
@@ -299,13 +348,6 @@ public class UserEditActivity extends Activity {
 	
 	private void startSavedListActivity() {
 		Intent intent = new Intent(this, SavedListActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
-	}
-	
-	private void startEditActivity() {
-		Intent intent = new Intent(this, UserEditActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);

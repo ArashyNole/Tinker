@@ -1,6 +1,7 @@
 package tk.skyrnet.tinker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import tk.skyrnet.tinker.MessageService.MessageServiceInterface;
@@ -13,6 +14,9 @@ import android.os.IBinder;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -22,6 +26,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
 import com.sinch.android.rtc.messaging.MessageClient;
@@ -196,4 +204,88 @@ ServiceConnection, MessageClientListener {
     		return convertView;
     	}
     }
+    
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		//menu.add(0, PROFILE_EDIT, 0, "Edit Profile");
+		//menu.add(0, FIND_USER, 1, "Find User");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options, menu);
+        return super.onCreateOptionsMenu(menu);
+	}
+	
+    /* Handles item selections */
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+    	case R.id.profile:
+    		Toast.makeText(MessagingActivity.this, "My Profile", Toast.LENGTH_SHORT).show();
+    		UserDetailsActivity.viewingUser = ParseUser.getCurrentUser();
+    		startDetailsActivity();
+            return true;
+    	case R.id.userlist:
+			Toast.makeText(MessagingActivity.this, "Saved User List", Toast.LENGTH_SHORT).show();
+			startSavedListActivity();
+			return true;
+    	case R.id.edit:
+    		Toast.makeText(MessagingActivity.this, "Edit Profile", Toast.LENGTH_SHORT).show();
+    		startEditActivity();
+            return true;
+		case R.id.find:
+			Toast.makeText(MessagingActivity.this, "Loading User", Toast.LENGTH_SHORT).show();
+			findUser();
+			return true;
+		case R.id.chat:
+			Toast.makeText(MessagingActivity.this, "Chat", Toast.LENGTH_SHORT).show();
+    		Intent serviceIntent = new Intent(getApplicationContext(),
+    	            MessageService.class);
+    		startService(serviceIntent);
+    		Intent intent = new Intent(getApplicationContext(), ListUsersActivity.class);
+    		startActivity(intent);
+			return true;
+		}
+        return false;
+    }
+    
+	private void findUser() {
+		ParseUser currentUser = ParseUser.getCurrentUser();
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("username", currentUser.getUsername());
+		params.put("viewingObjectId", UserDetailsActivity.viewingUser.getObjectId());
+		ParseCloud.callFunctionInBackground("getNearbyProfile", params, new FunctionCallback<ParseUser>() {
+		   public void done(ParseUser parseUser, ParseException e) {
+		       if (e == null) {
+		    	  UserDetailsActivity.viewingUser = parseUser;
+		    	  Log.d("UserDetailsActivity", parseUser.getJSONObject("profile").toString());
+		    	  startDetailsActivity();
+		       }
+		       else
+		       {
+		    	   Log.d("UserDetailsActivity", "Something went wrong!");
+		       }
+		   }
+		});
+		
+	}
+    
+    private void startDetailsActivity() {
+		Intent intent = new Intent(this, UserDetailsActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+    
+	private void startEditActivity() {
+		Intent intent = new Intent(this, UserEditActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+	
+	private void startSavedListActivity() {
+		Intent intent = new Intent(this, SavedListActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
 }
