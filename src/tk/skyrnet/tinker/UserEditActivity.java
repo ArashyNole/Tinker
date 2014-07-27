@@ -2,6 +2,8 @@ package tk.skyrnet.tinker;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -18,10 +20,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.FacebookRequestError;
 import com.facebook.Request;
@@ -29,7 +35,11 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 public class UserEditActivity extends Activity {
@@ -48,6 +58,9 @@ public class UserEditActivity extends Activity {
 	private Button saveButton;
     private String facebookId;
     private String userName;
+    
+	public static ArrayList<ParseUser> userList = new ArrayList<ParseUser>();
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +110,59 @@ public class UserEditActivity extends Activity {
 			startLoginActivity();
 		}
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		//menu.add(0, PROFILE_EDIT, 0, "Edit Profile");
+		//menu.add(0, FIND_USER, 1, "Find User");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options, menu);
+        return super.onCreateOptionsMenu(menu);
+	}
+	
+    /* Handles item selections */
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+    	case R.id.profile:
+    		Toast.makeText(UserEditActivity.this, "My Profile", Toast.LENGTH_SHORT).show();
+    		updateViewsWithProfileInfo();
+            return true;
+    	case R.id.userlist:
+			Toast.makeText(UserEditActivity.this, "Saved User List", Toast.LENGTH_SHORT).show();
+			ParseRelation<ParseObject> relation = ParseUser.getCurrentUser().getRelation("saved");
+			userList.clear();
+			
+			relation.getQuery().findInBackground(new FindCallback<ParseObject>() {
+			    public void done(List<ParseObject> results, ParseException e) {
+			      if (e != null) {
+			        // There was an error
+			      } else {
+			    	  for (int i = 0; i < results.size(); ++i)
+			    	  {
+			    		Log.d("UserDetailsActivity", results.get(i).getJSONObject("profile").toString());
+						userList.add((ParseUser) results.get(i));
+			    	  }
+			    	  
+			    	  startSavedListActivity();
+			      }
+			    }
+			});
+			return true;
+    	case R.id.edit:
+    		Toast.makeText(UserEditActivity.this, "Edit Profile", Toast.LENGTH_SHORT).show();
+    		startEditActivity();
+            return true;
+		case R.id.find:
+			Toast.makeText(UserEditActivity.this, "Loading User", Toast.LENGTH_SHORT).show();
+			startDetailsActivity();
+			return true;
+		case R.id.chat:
+			Toast.makeText(UserEditActivity.this, "Chat", Toast.LENGTH_SHORT).show();
+			return true;
+		}
+        return false;
+    }
 
 	private void makeMeRequest() {
 		Request request = Request.newMeRequest(ParseFacebookUtils.getSession(),
@@ -226,6 +292,20 @@ public class UserEditActivity extends Activity {
 	
 	private void startDetailsActivity() {
 		Intent intent = new Intent(this, UserDetailsActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+	
+	private void startSavedListActivity() {
+		Intent intent = new Intent(this, SavedListActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+	
+	private void startEditActivity() {
+		Intent intent = new Intent(this, UserEditActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
