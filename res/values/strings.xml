@@ -29,5 +29,7 @@
     <string name="when_were_you_born_">When were you born?</string>
     <string name="seeing_anyone_">Seeing anyone?</string>
     <string name="message_elipses">Message...</string>
-    
+   	<string name="tutorial_title">Let\'s get started!</string>
+   	<string name="tutorial_message">If you find somebody interesting, swipe right. If you stumble upon somebody boring, swipe left. Simple enough.</string>
+   	<string name="tutorial_dismiss">Got it!</string>
 </resources>

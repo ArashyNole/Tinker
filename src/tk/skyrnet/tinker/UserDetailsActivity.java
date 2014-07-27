@@ -8,6 +8,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -101,9 +103,21 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
                 MessageService.class);
 		startService(serviceIntent);
         
-
-		// Fetch Facebook user info if the session is active
-		Session session = ParseFacebookUtils.getSession();
+        if (!ParseUser.getCurrentUser().getBoolean("viewedTut")) {
+        	  AlertDialog.Builder builder = new AlertDialog.Builder(this);
+              builder.setTitle(R.string.tutorial_title);
+              builder.setMessage(R.string.tutorial_message);
+              builder.setNegativeButton(R.string.tutorial_dismiss, new DialogInterface.OnClickListener() {
+                  @Override
+                  public void onClick(DialogInterface arg0, int arg1) {
+                	  ParseUser.getCurrentUser().put("viewedTut", true);
+                	  ParseUser.getCurrentUser().saveInBackground();
+                  }
+              });
+              builder.show();
+        }
+        Session session = ParseFacebookUtils.getSession();
+		
 		if (session != null && session.isOpened()) {
 			//makeMeRequest();
 			if (viewingUser == null)
