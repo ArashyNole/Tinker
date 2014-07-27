@@ -322,14 +322,15 @@
     
     <Button
         android:id="@+id/saveButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:layout_margin="25dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
         android:text="@string/save"
         android:textColor="#fff"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/mybutton"
+        android:background="@drawable/scorp_button"
         />
     </LinearLayout>
 </ScrollView>

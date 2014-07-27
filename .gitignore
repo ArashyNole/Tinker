@@ -58,9 +58,3 @@ proguard/
 
 #Log Files
 *.log
-
-# Project properties file
-project.properties
-
-# Vim saved files
-*~

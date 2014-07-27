@@ -44,7 +44,7 @@
             android:shrinkColumns="1"
             android:gravity="center_horizontal"
             android:background="@drawable/table_round_shape">
-        <TableRow android:layout_height="wrap_content">
+        <TableRow>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,7 +58,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:textColor="#333"
                 android:textSize="16sp" />
@@ -73,7 +72,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:layout_height="wrap_content">
+        <TableRow>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -87,7 +86,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:textColor="#333"
                 android:textSize="16sp" />
@@ -102,7 +100,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:layout_height="wrap_content">
+        <TableRow>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -116,7 +114,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:textColor="#333"
                 android:textSize="16sp" />
@@ -131,7 +128,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:layout_height="wrap_content">
+        <TableRow>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -145,7 +142,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:textColor="#333"
                 android:textSize="16sp" />
@@ -160,8 +156,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp"
-            android:layout_height="wrap_content">
+        <TableRow android:minHeight="70dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -173,9 +168,8 @@
             <TextView
                 android:id="@+id/userDescription"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:singleLine="false"
                 android:textColor="#333"
@@ -191,8 +185,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp"
-                  android:layout_height="wrap_content">
+        <TableRow android:minHeight="70dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -204,12 +197,12 @@
             <TextView
                 android:id="@+id/userBooks"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:singleLine="false"
                 android:maxLines="100"
+                android:lines="100"
                 android:textColor="#333"
                 android:textSize="16sp" />
         </TableRow>
@@ -223,8 +216,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp"
-            android:layout_height="wrap_content">
+        <TableRow android:minHeight="70dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -236,9 +228,8 @@
             <TextView
                 android:id="@+id/userMusic"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:singleLine="false"
                 android:maxLines="100"
@@ -255,8 +246,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp"
-            android:layout_height="wrap_content">
+        <TableRow android:minHeight="70dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -268,9 +258,8 @@
             <TextView
                 android:id="@+id/userMovies"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:singleLine="false"
                 android:maxLines="100"
@@ -287,8 +276,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="#999" />
         </TableRow>
-        <TableRow android:minHeight="70dp"
-            android:layout_height="wrap_content">
+        <TableRow android:minHeight="70dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -300,9 +288,8 @@
             <TextView
                 android:id="@+id/userTelevision"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
-				android:layout_marginRight="10dp"
                 android:layout_gravity="left"
                 android:singleLine="false"
 				android:maxLines="100"
