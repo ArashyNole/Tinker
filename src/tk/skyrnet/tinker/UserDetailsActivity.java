@@ -40,6 +40,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.PushService;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
 import com.sinch.android.rtc.messaging.MessageClient;
@@ -76,6 +77,8 @@ public class UserDetailsActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.userdetails);
+		
+		PushService.setDefaultPushCallback(this, UserDetailsActivity.class);
 
 		userProfilePictureView = (ProfilePictureView) findViewById(R.id.userProfilePicture);
 		userNameView = (TextView) findViewById(R.id.userName);
