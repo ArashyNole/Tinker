@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import tk.skyrnet.tinker.MessageService.MessageServiceInterface;
 import android.app.Activity;
@@ -30,9 +31,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
@@ -94,6 +97,23 @@ ServiceConnection, MessageClientListener {
 			e.printStackTrace();
 		}
         messageService.sendMessage(recipientId, messageBody);
+        
+        messageBodyField.setText("");
+
+    	JSONObject profile = ParseUser.getCurrentUser().getJSONObject("profile");
+    	String name;
+    	
+    	try {
+			name = profile.getString("name");
+		} catch (JSONException e1) {
+			name = "someone";
+		}
+    	
+
+    	HashMap<String, String> params = new HashMap<String,String>();		
+    	params.put("sender", name);
+		params.put("recipient", recipientId);
+        ParseCloud.callFunctionInBackground("newMessageNotification", params, null);
     }
     
     private void doBind() {

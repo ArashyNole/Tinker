@@ -30,6 +30,7 @@ import com.facebook.Session;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 public class CreateUserActivity extends Activity {
@@ -147,6 +148,11 @@ public class CreateUserActivity extends Activity {
 
 								// Show the user info
 								updateViewsWithProfileInfo();
+								
+								// Save the current Installation to Parse.
+								ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+								installation.put("user",ParseUser.getCurrentUser());
+								installation.saveInBackground();								
 							} catch (JSONException e) {
 								Log.d(IntegratingFacebookTutorialApplication.TAG,
 										"Error parsing returned user data.");
