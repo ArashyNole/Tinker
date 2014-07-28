@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.PushService;
 import com.sinch.android.rtc.PushPair;
@@ -72,6 +73,11 @@ ServiceConnection, MessageClientListener {
             }
         });
         
+    	// Save the current Installation to Parse.
+		ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+		installation.put("user",ParseUser.getCurrentUser().getObjectId());
+		installation.saveInBackground();
+		
 		PushService.setDefaultPushCallback(this, UserDetailsActivity.class);
 
         messageBodyField = (EditText) findViewById(R.id.messageBodyField);

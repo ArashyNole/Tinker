@@ -108,6 +108,8 @@ public class CreateUserActivity extends Activity {
 							// Create a JSON object to hold the profile info
 							JSONObject userProfile = new JSONObject();
 							
+						
+							
 							try {
 								// Populate the JSON object
 								Log.d("CreateUserActivity", "FBid");
@@ -148,11 +150,6 @@ public class CreateUserActivity extends Activity {
 
 								// Show the user info
 								updateViewsWithProfileInfo();
-								
-								// Save the current Installation to Parse.
-								ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-								installation.put("user",ParseUser.getCurrentUser());
-								installation.saveInBackground();
 								
 							} catch (JSONException e) {
 								Log.d(IntegratingFacebookTutorialApplication.TAG,
