@@ -26,6 +26,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.PushService;
 
 public class ListUsersActivity extends ListActivity {
 	ArrayAdapter<String> adapter;
@@ -45,6 +46,8 @@ public class ListUsersActivity extends ListActivity {
 			}
 		}
 		
+		PushService.setDefaultPushCallback(this, UserDetailsActivity.class);
+
 		adapter = new ArrayAdapter<String>(this, R.layout.row, R.id.label, al);
   	    setListAdapter(adapter);
   	    registerForContextMenu(getListView());

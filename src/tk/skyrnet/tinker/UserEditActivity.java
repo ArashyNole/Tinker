@@ -44,6 +44,7 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.PushService;
 
 public class UserEditActivity extends Activity {
 
@@ -96,6 +97,9 @@ public class UserEditActivity extends Activity {
 		if (session != null && session.isOpened()) {
 			makeMeRequest();
 		}
+		
+		PushService.setDefaultPushCallback(this, UserDetailsActivity.class);
+
 	}
 
 	@Override

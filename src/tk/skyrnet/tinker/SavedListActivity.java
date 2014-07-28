@@ -26,6 +26,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.PushService;
 
 
 public class SavedListActivity extends ListActivity {
@@ -50,6 +51,9 @@ public class SavedListActivity extends ListActivity {
 		adapter = new ArrayAdapter<String>(this, R.layout.row, R.id.label, al);
   	    setListAdapter(adapter);
   	    registerForContextMenu(getListView());
+  	    
+		PushService.setDefaultPushCallback(this, UserDetailsActivity.class);
+
 	}
 	
 	public void onListItemClick(ListView parent, View v, int position, long id)

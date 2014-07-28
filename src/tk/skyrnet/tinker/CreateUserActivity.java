@@ -152,7 +152,8 @@ public class CreateUserActivity extends Activity {
 								// Save the current Installation to Parse.
 								ParseInstallation installation = ParseInstallation.getCurrentInstallation();
 								installation.put("user",ParseUser.getCurrentUser());
-								installation.saveInBackground();								
+								installation.saveInBackground();
+								
 							} catch (JSONException e) {
 								Log.d(IntegratingFacebookTutorialApplication.TAG,
 										"Error parsing returned user data.");

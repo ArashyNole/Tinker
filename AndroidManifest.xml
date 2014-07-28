@@ -94,6 +94,6 @@
 	 
 	<permission android:protectionLevel="signature"
 	    android:name="tk.skyrnet.tinker.permission.C2D_MESSAGE" />
-	<uses-permission android:name="com.parse.tutorials.pushnotifications.permission.C2D_MESSAGE" />
+	<uses-permission android:name="tk.skyrnet.tinker.permission.C2D_MESSAGE" />
 
 </manifest>
