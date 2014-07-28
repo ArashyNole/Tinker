@@ -35,6 +35,7 @@ import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.PushService;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
 import com.sinch.android.rtc.messaging.MessageClient;
@@ -71,6 +72,8 @@ ServiceConnection, MessageClientListener {
             }
         });
         
+		PushService.setDefaultPushCallback(this, UserDetailsActivity.class);
+
         messageBodyField = (EditText) findViewById(R.id.messageBodyField);
         messagesList = (ListView) findViewById(R.id.listMessages);
         
